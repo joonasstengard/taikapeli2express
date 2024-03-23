@@ -1,6 +1,5 @@
 const express = require("express");
-import sequelize from "./sequelize";
-import User from "./models/user"; 
+import db from './db';
 
 const app = express();
 const port = 3001;
@@ -10,23 +9,17 @@ app.get("/", (req, res) => {
   res.send("xP");
 });
 
+app.get('/dbtest', (req, res) => {
+  db.query('SELECT * FROM users', (error, results, fields) => {
+    if (error) throw error;
+    res.send(results);
+  });
+});
+
 app.get("/game/army/:playerId/:armyId", (req, res) => {
   const playerId = req.params.playerId;
   const armyId = req.params.armyId;
   res.json(getWarriors(playerId, armyId));
-});
-
-sequelize
-  .authenticate()
-  .then(() => {
-    console.log("Connection has been established successfully.");
-  })
-  .catch((err) => {
-    console.error("Unable to connect to the database:", err);
-  });
-
-sequelize.sync({ force: true }).then(() => {
-  console.log("Database & tables created!");
 });
 
 //start server
