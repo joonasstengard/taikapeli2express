@@ -1,4 +1,6 @@
-export function getWarriors(playerId: number, armyId: number) {
+function getWarriors(playerId: number, armyId: number) {
+
+  
   // fetching warriors
   const warriors = [
     {
@@ -68,3 +70,5 @@ export function getWarriors(playerId: number, armyId: number) {
   ];
   return warriors;
 }
+
+export default getWarriors;
