@@ -1,4 +1,3 @@
 node_modules
 notes
-mysqlConnection.ts
-sequelize.ts
+db.ts

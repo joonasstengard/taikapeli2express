@@ -16,10 +16,17 @@ app.get('/dbtest', (req, res) => {
   });
 });
 
-app.get("/game/army/:playerId/:armyId", (req, res) => {
-  const playerId = req.params.playerId;
-  const armyId = req.params.armyId;
-  res.json(getWarriors(playerId, armyId));
+app.get("/game/army/:userId/:armyId", async (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const armyId = parseInt(req.params.armyId);
+
+  try {
+    const warriors = await getWarriors(userId, armyId);
+    res.send(warriors);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching warriors');
+  }
 });
 
 //start server
