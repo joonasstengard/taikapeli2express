@@ -1,9 +1,16 @@
 const express = require("express");
+const cors = require('cors');
 import db from './db';
+
+import getUser from "./route/getUser";
+import getWarriors from "./route/getWarriors";
 
 const app = express();
 const port = 3001;
-import getWarriors from "./route/getWarriors";
+
+app.use(cors({
+  origin: '*'
+}));
 
 app.get("/", (req, res) => {
   res.send("xP");
@@ -16,17 +23,14 @@ app.get('/dbtest', (req, res) => {
   });
 });
 
-app.get("/game/army/:userId/:armyId", async (req, res) => {
-  const userId = parseInt(req.params.userId);
-  const armyId = parseInt(req.params.armyId);
+// user
+app.get("/game/user/:userId", async (req, res) => {
+  res.send(await getUser(req, res))
+});
 
-  try {
-    const warriors = await getWarriors(userId, armyId);
-    res.send(warriors);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Error fetching warriors');
-  }
+// army
+app.get("/game/army/:userId/:armyId", async (req, res) => {
+  res.send(await getWarriors(req, res))
 });
 
 //start server
