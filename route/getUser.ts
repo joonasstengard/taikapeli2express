@@ -12,7 +12,6 @@ function getWarriors(req, res): Promise<any> {
           if (error) {
             reject(error);
           } else {
-            console.log(results);
             resolve(results);
           }
         }

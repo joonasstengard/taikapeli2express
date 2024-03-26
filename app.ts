@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require('cors');
-import db from './db';
 
+import getArmy from "./route/getArmy";
 import getUser from "./route/getUser";
 import getWarriors from "./route/getWarriors";
 
@@ -16,11 +16,9 @@ app.get("/", (req, res) => {
   res.send("xP");
 });
 
-app.get('/dbtest', (req, res) => {
-  db.query('SELECT * FROM users', (error, results, fields) => {
-    if (error) throw error;
-    res.send(results);
-  });
+//army
+app.get("/game/army/:userId/:armyId", async (req, res) => {
+  res.send(await getArmy(req, res))
 });
 
 // user
@@ -28,7 +26,7 @@ app.get("/game/user/:userId", async (req, res) => {
   res.send(await getUser(req, res))
 });
 
-// army
+// warriors
 app.get("/game/army/:userId/:armyId", async (req, res) => {
   res.send(await getWarriors(req, res))
 });
