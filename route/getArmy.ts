@@ -7,8 +7,8 @@ function getArmy(req, res): Promise<any> {
 
     return new Promise((resolve, reject) => {
       db.query(
-        "SELECT * FROM army WHERE userId = ? AND armyId = ?",
-        [userId, armyId],
+        "SELECT * FROM armies WHERE id = ? AND userId = ?",
+        [armyId, userId],
         (error, results) => {
           if (error) {
             reject(error);
