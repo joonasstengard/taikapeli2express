@@ -9,7 +9,7 @@ function getUsersCurrentBattle(req, res): Promise<any> {
     return new Promise((resolve, reject) => {
       db.query(
         "SELECT * FROM battles WHERE userId = ? AND isCurrentlyHappening = 1 ORDER BY id DESC LIMIT 1",
-        [userId, userId],
+        [userId],
         (error, results) => {
           if (error) {
             reject(error);
