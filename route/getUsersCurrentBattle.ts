@@ -14,7 +14,7 @@ function getUsersCurrentBattle(req, res): Promise<any> {
           if (error) {
             reject(error);
           } else {
-            resolve(results[0]);
+            resolve(results);
           }
         }
       );
