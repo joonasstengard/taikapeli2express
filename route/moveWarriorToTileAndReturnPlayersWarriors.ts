@@ -1,6 +1,6 @@
 import db from "../db";
 
-function moveWarriorToTileAndReturnPlayersWarriors(req, res) {
+function moveWarriorToTileAndReturnPlayersWarriors(req) {
   const tileId = req.params.tileId;
   const warriorId = parseInt(req.params.warriorId);
 
@@ -48,12 +48,8 @@ function moveWarriorToTileAndReturnPlayersWarriors(req, res) {
     });
   })
   .then(result => {
-    res.status(200).json(result);
+    return result;
   })
-  .catch(error => {
-    console.error(error);
-    res.status(500).send("Error moving warrior to tile");
-  });
 }
 
 export default moveWarriorToTileAndReturnPlayersWarriors;
