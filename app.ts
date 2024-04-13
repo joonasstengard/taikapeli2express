@@ -6,7 +6,8 @@ import getArmy from "./route/getArmy";
 import getUser from "./route/getUser";
 import getUsersCurrentBattle from "./route/getUsersCurrentBattle";
 import getWarriors from "./route/getWarriors";
-import moveWarriorToTileAndReturnPlayersWarriors from "./route/moveWarriorToTileAndReturnPlayersWarriors";
+import movePlayersWarriorToTile from "./route/movePlayersWarriorToTile";
+import playersWarriorWaits from "./route/playersWarriorWaits";
 
 const app = express();
 const port = 3001;
@@ -32,29 +33,47 @@ app.get("/game/army/:userId/:armyId", async (req, res) => {
 app.get("/game/battle/getuserscurrentbattle/:userId", async (req, res) => {
   res.send(await getUsersCurrentBattle(req, res));
 });
-// move players warrior to tile, use that warriors turn, and
-// return players warriors
+// PLAYERS actions in battle ------------------------
+// move PLAYERS warrior to tile, return all warriors
 app.get(
-  "/game/battle/warriors/movewarriortotile/:warriorId/:tileId",
+  "/game/battle/warriors/moveplayerswarriortotile/:warriorId/:tileId/:playersArmyId/:computersArmyId",
   async (req, res) => {
     try {
-      const result = await moveWarriorToTileAndReturnPlayersWarriors(req);
+      const result = await movePlayersWarriorToTile(req);
       res.status(200).json(result);
     } catch (error) {
       console.error(error);
-      res.status(500).send("Error moving warrior to tile");
+      res.status(500).send("Error moving players warrior to tile");
     }
   }
 );
-// computers (opponent) warriors turn, return all warriors from the battle
-app.get("/game/battle/computerswarriorsturn/:playerArmyId/:computerArmyId/:warriorId", async (req, res) => {
-  try {
-    res.send(await computersWarriorsTurn(req));
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error with computers warriors turn");
+// players warrior waits, return all warriors
+app.get(
+  "/game/battle/warriors/playerswarriorwait/:warriorId/:playersArmyId/:computersArmyId",
+  async (req, res) => {
+    try {
+      const result = await playersWarriorWaits(req);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error with players warrior waiting");
+    }
   }
-});
+);
+
+// ----------------------------------------------------
+// computers (opponent) warriors turn, return all warriors from the battle
+app.get(
+  "/game/battle/computerswarriorsturn/:playersArmyId/:computersArmyId",
+  async (req, res) => {
+    try {
+      res.send(await computersWarriorsTurn(req));
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error with computers warriors turn");
+    }
+  }
+);
 // ====================================================================
 
 // user
