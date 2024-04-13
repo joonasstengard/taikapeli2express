@@ -1,6 +1,7 @@
 import db from "../db";
 import advanceBattleTurn from "../lib/advanceBattleTurn";
-import computerWarriorMovePosition from "../lib/computerWarriorMovePosition";
+import computerWarriorMovePosition from "../lib/computersActionsInBattle/computerWarriorMovePosition";
+import computerWarriorWait from "../lib/computersActionsInBattle/computerWarriorWait";
 import getWhichWarriorsTurnItIs from "../lib/getWhichWarriorsTurnItIs";
 
 async function computersWarriorsTurn(req) {
@@ -29,13 +30,15 @@ async function computersWarriorsTurn(req) {
           computersArmyId
         );
 
-        // wip: for now, they can only move, but here should be randomized what they do
-
-        if (true) {
+        // randomize here what is the computers action
+        const rng = Math.random(); // Generate a random number once, 0.0-0.99
+        if (rng < 0.75) {
           await computerWarriorMovePosition(
             warriors,
             warriorIdWhoseTurnItIsToMove
           );
+        } else {
+          computerWarriorWait(warriors, warriorIdWhoseTurnItIsToMove);
         }
 
         // after the warrior has taken their move, no matter what they did, always call this:

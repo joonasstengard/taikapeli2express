@@ -1,4 +1,4 @@
-import db from "../db";
+import db from "../../db";
 
 function getRange(stamina) {
   return Math.floor(stamina / 10) + 1;
