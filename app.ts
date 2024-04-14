@@ -6,6 +6,7 @@ import getArmy from "./route/getArmy";
 import getUser from "./route/getUser";
 import getUsersCurrentBattle from "./route/getUsersCurrentBattle";
 import getWarriors from "./route/getWarriors";
+import attackWithPlayersWarriorToTile from "./route/attackWithPlayersWarriorToTile";
 import movePlayersWarriorToTile from "./route/movePlayersWarriorToTile";
 import playersWarriorWaits from "./route/playersWarriorWaits";
 
@@ -34,6 +35,19 @@ app.get("/game/battle/getuserscurrentbattle/:userId", async (req, res) => {
   res.send(await getUsersCurrentBattle(req, res));
 });
 // PLAYERS actions in battle ------------------------
+app.get(
+  "/game/battle/warriors/attackwithplayerswarriortotile/:warriorId/:tileId/:playersArmyId/:computersArmyId",
+  async (req, res) => {
+    try {
+      const result = await attackWithPlayersWarriorToTile(req);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error with players warrior attacking");
+    }
+  }
+);
+
 // move PLAYERS warrior to tile, return all warriors
 app.get(
   "/game/battle/warriors/moveplayerswarriortotile/:warriorId/:tileId/:playersArmyId/:computersArmyId",
