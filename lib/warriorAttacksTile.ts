@@ -9,7 +9,7 @@ async function warriorAttacksTile(
   try {
     // Query to find defenders on the specified tile from either the player's or computer's army
     const queryDefender = `
-        SELECT id, currentHealth
+        SELECT id, currentHealth, name
         FROM warriors
         WHERE battleTileCurrent = ?
           AND (armyId = ? OR armyId = ?)`;
@@ -27,7 +27,7 @@ async function warriorAttacksTile(
 
     // Query to find the attacking warrior's strength
     const queryAttacker = `
-        SELECT strength
+        SELECT strength, name
         FROM warriors
         WHERE id = ?`;
     const [attackers] = await db
@@ -55,7 +55,7 @@ async function warriorAttacksTile(
         attacker.name +
         " attacked " +
         defender.name +
-        "successfully, new health: " +
+        " successfully, new health: " +
         newHealth
     );
   } catch (error) {
