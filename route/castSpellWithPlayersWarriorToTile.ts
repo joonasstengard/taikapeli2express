@@ -1,10 +1,11 @@
 import db from "../db";
 import advanceBattleTurn from "../lib/advanceBattleTurn";
 import fetchWarriorsFromBattleArmies from "../lib/fetchWarriorsFromBattleArmies";
-import warriorAttacksTile from "../lib/warriorAttacksTile";
+import warriorCastsSpellToTile from "../lib/warriorCastsSpellToTile";
 
-async function movePlayersWarriorToTile(req) {
+async function castSpellWithPlayersWarriorToTile(req) {
   const tileId = req.params.tileId;
+  const spellId = req.params.spellId;
   const warriorId = parseInt(req.params.warriorId);
   const playersArmyId = parseInt(req.params.playersArmyId);
   const computersArmyId = parseInt(req.params.computersArmyId);
@@ -16,10 +17,11 @@ async function movePlayersWarriorToTile(req) {
         return;
       }
 
-      const attackAndFetchWarriors = async () => {
+      const castSpellAndFetchWarriors = async () => {
         try {
-          await warriorAttacksTile(
+          await warriorCastsSpellToTile(
             tileId,
+            spellId,
             warriorId,
             playersArmyId,
             computersArmyId
@@ -53,9 +55,9 @@ async function movePlayersWarriorToTile(req) {
         }
       };
 
-      attackAndFetchWarriors();
+      castSpellAndFetchWarriors();
     });
   });
 }
 
-export default movePlayersWarriorToTile;
+export default castSpellWithPlayersWarriorToTile;

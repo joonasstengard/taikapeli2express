@@ -1,12 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 
+import attackWithPlayersWarriorToTile from "./route/attackWithPlayersWarriorToTile";
+import castSpellWithPlayersWarriorToTile from "./route/castSpellWithPlayersWarriorToTile";
 import computersWarriorsTurn from "./route/computersWarriorsTurn";
 import getArmy from "./route/getArmy";
 import getUser from "./route/getUser";
 import getUsersCurrentBattle from "./route/getUsersCurrentBattle";
 import getWarriors from "./route/getWarriors";
-import attackWithPlayersWarriorToTile from "./route/attackWithPlayersWarriorToTile";
 import movePlayersWarriorToTile from "./route/movePlayersWarriorToTile";
 import playersWarriorWaits from "./route/playersWarriorWaits";
 
@@ -47,7 +48,6 @@ app.get(
     }
   }
 );
-
 // move PLAYERS warrior to tile, return all warriors
 app.get(
   "/game/battle/warriors/moveplayerswarriortotile/:warriorId/:tileId/:playersArmyId/:computersArmyId",
@@ -58,6 +58,19 @@ app.get(
     } catch (error) {
       console.error(error);
       res.status(500).send("Error moving players warrior to tile");
+    }
+  }
+);
+// players warrior casts spell to tile, return all warriors
+app.get(
+  "/game/battle/warriors/castspellwithplayerswarriortotile/:warriorId/:tileId/:spellId/:playersArmyId/:computersArmyId",
+  async (req, res) => {
+    try {
+      const result = await castSpellWithPlayersWarriorToTile(req);
+      res.status(200).json(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error with players warrior casting spell");
     }
   }
 );

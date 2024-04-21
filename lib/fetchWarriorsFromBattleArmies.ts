@@ -22,7 +22,7 @@ async function fetchWarriorsFromBattleArmies(
     if (allWarriorIds.length > 0) {
       const [spellsForWarriors]: any = await db.promise().query(
         `
-        SELECT ws.warriorId, s.id, s.name, s.description, s.manaCost, s.baseDamageTarget, s.baseHealTarget, s.type 
+        SELECT ws.warriorId, s.id, s.name, s.description, s.manaCost, s.baseDamageTarget, s.baseHealTarget, s.type, s.spellRange
         FROM warriorspells ws 
         JOIN spells s ON ws.spellId = s.id 
         WHERE ws.warriorId IN (?)`,
@@ -42,6 +42,7 @@ async function fetchWarriorsFromBattleArmies(
           baseDamageTarget: spell.baseDamageTarget,
           baseHealTarget: spell.baseHealTarget,
           type: spell.type,
+          spellRange: spell.spellRange,
         });
         return acc;
       }, {});
