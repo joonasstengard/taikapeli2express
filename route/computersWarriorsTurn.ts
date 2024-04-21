@@ -2,6 +2,7 @@ import db from "../db";
 import advanceBattleTurn from "../lib/advanceBattleTurn";
 import computerWarriorMovePosition from "../lib/computersActionsInBattle/computerWarriorMovePosition";
 import computerWarriorWait from "../lib/computersActionsInBattle/computerWarriorWait";
+import fetchWarriorsFromBattleArmies from "../lib/fetchWarriorsFromBattleArmies";
 import getWhichWarriorsTurnItIs from "../lib/getWhichWarriorsTurnItIs";
 
 async function computersWarriorsTurn(req) {
@@ -38,7 +39,7 @@ async function computersWarriorsTurn(req) {
             warriorIdWhoseTurnItIsToMove
           );
         } else {
-          computerWarriorWait(warriors, warriorIdWhoseTurnItIsToMove);
+          await computerWarriorWait(warriors, warriorIdWhoseTurnItIsToMove);
         }
 
         // after the warrior has taken their move, no matter what they did, always call this:
@@ -48,17 +49,16 @@ async function computersWarriorsTurn(req) {
           warriorIdWhoseTurnItIsToMove
         );
 
-        // fetching all the warriors from both armies at the end
-        const [playerArmyWarriors] = await db
-          .promise()
-          .query("SELECT * FROM warriors WHERE armyId = ?", [playersArmyId]);
-
-        const [computerArmyWarriors] = await db
-          .promise()
-          .query("SELECT * FROM warriors WHERE armyId = ?", [computersArmyId]);
+        // Using the new function to fetch all warriors from both armies at the end
+        const { playersWarriors, computersWarriors } =
+          await fetchWarriorsFromBattleArmies(playersArmyId, computersArmyId);
 
         db.commit();
-        resolve({ playerArmyWarriors, computerArmyWarriors, battleObject });
+        resolve({
+          playerArmyWarriors: playersWarriors,
+          computerArmyWarriors: computersWarriors,
+          battleObject,
+        });
       } catch (error) {
         db.rollback(() => reject(error));
       }
