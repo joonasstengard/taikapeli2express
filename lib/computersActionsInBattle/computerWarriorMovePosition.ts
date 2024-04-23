@@ -18,6 +18,7 @@ function isValidPosition(
 }
 
 function getRandomPosition(currentPosition, maxDistance, occupiedPositions) {
+  // wip: map columns and rows are hardcoded here (width and height of map)
   const columns = ["A", "B", "C", "D", "E", "F"];
   const rows = [1, 2, 3, 4, 5, 6, 7, 8];
   let availablePositions = [];
