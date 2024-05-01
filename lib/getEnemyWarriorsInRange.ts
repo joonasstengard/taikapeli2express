@@ -32,6 +32,7 @@ async function getEnemyWarriorsInRange(
     const enemiesInRange = allWarriorsOfBattle.filter((warrior) => {
       return (
         warrior.armyId !== currentWarrior.armyId &&
+        warrior.currentHealth > 0 &&
         calculateDistance(
           warrior.battleTileCurrent,
           currentWarrior.battleTileCurrent

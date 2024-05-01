@@ -16,42 +16,58 @@ async function playersWarriorWaits(req) {
         return;
       }
 
-      try {
-        // Update warrior's hasMovedThisRound
-        await db
-          .promise()
-          .query("UPDATE warriors SET hasMovedThisRound = 1 WHERE id = ?", [
-            warriorId,
-          ]);
-
-        // After a warrior has taken their move, always call this
-        const battleObject = await advanceBattleTurn(
-          playersArmyId,
-          computersArmyId,
-          warriorId
-        );
-
-        // fetch warriors
-        const { playersWarriors, computersWarriors } =
-          await fetchWarriorsFromBattleArmies(playersArmyId, computersArmyId);
-
-        // Commit transaction
-        db.commit((err) => {
+      // Fetch the warrior details from the database
+      db.query(
+        "SELECT name FROM warriors WHERE id = ?",
+        [warriorId],
+        async (err, results: any) => {
           if (err) {
             db.rollback(() => reject(err));
             return;
           }
+          if (results.length === 0) {
+            db.rollback(() => reject(new Error("Warrior not found")));
+            return;
+          }
+          const warriorWhoWaited = results[0];
+          // Generate commentary line using the warrior's name
+          const commentaryLine = warriorWhoWaited.name + " waited.";
 
-          // Including both armies' warriors and battleObject in the response
-          resolve({
-            playersWarriors,
-            computersWarriors,
-            battleObject,
-          });
-        });
-      } catch (error) {
-        db.rollback(() => reject(error));
-      }
+          try {
+            // After a warrior has taken their move, always call this
+            const battleObject = await advanceBattleTurn(
+              playersArmyId,
+              computersArmyId,
+              warriorId,
+              commentaryLine
+            );
+
+            // Fetch warriors
+            const { playersWarriors, computersWarriors } =
+              await fetchWarriorsFromBattleArmies(
+                playersArmyId,
+                computersArmyId
+              );
+
+            // Commit transaction
+            db.commit((err) => {
+              if (err) {
+                db.rollback(() => reject(err));
+                return;
+              }
+
+              // Including both armies' warriors and battleObject in the response
+              resolve({
+                playersWarriors,
+                computersWarriors,
+                battleObject,
+              });
+            });
+          } catch (error) {
+            db.rollback(() => reject(error));
+          }
+        }
+      );
     });
   });
 }

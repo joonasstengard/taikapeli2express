@@ -42,6 +42,7 @@ async function warriorAttacksTile(
 
     // Calculate new health for the defender
     const newHealth = Math.max(defender.currentHealth - attacker.strength, 0); // Ensure health does not go below zero
+    const oldHealth = defender.currentHealth;
 
     // Update defender's health in the database
     const updateQuery = `
@@ -57,6 +58,15 @@ async function warriorAttacksTile(
         defender.name +
         " successfully, new health: " +
         newHealth
+    );
+    // return commentary line
+    return (
+      attacker.name +
+      " attacked " +
+      defender.name +
+      " for " +
+      (oldHealth - newHealth) +
+      " damage."
     );
   } catch (error) {
     console.error("Error during attack:", error.message);

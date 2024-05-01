@@ -19,7 +19,7 @@ async function castSpellWithPlayersWarriorToTile(req) {
 
       const castSpellAndFetchWarriors = async () => {
         try {
-          await warriorCastsSpellToTile(
+          const commentaryLine = await warriorCastsSpellToTile(
             tileId,
             spellId,
             warriorId,
@@ -29,7 +29,8 @@ async function castSpellWithPlayersWarriorToTile(req) {
           const battleObject = await advanceBattleTurn(
             playersArmyId,
             computersArmyId,
-            warriorId
+            warriorId,
+            commentaryLine
           );
           // fetch all warriors
           const { playersWarriors, computersWarriors } =

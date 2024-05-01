@@ -5,7 +5,12 @@ import db from "../db";
 // it increments battles round and turn counters and sets the warriors hasMovedThisTurn to 1
 // and in the end it fetches and returns the updated battle data for the battle
 
-function advanceBattleTurn(playersArmyId, computersArmyId, warriorId) {
+function advanceBattleTurn(
+  playersArmyId: number,
+  computersArmyId: number,
+  warriorId: number,
+  commentaryLine: string
+) {
   return new Promise((resolve, reject) => {
     db.beginTransaction((err) => {
       if (err) {
@@ -62,109 +67,113 @@ function advanceBattleTurn(playersArmyId, computersArmyId, warriorId) {
             );
           }
 
-          // Proceed with the battle turn
+          // Proceed with the battle turn and add latest commentaryLine
           const updateBattleSql = `
           UPDATE battles
-          SET turnsTaken = turnsTaken + 1
+          SET turnsTaken = turnsTaken + 1, commentaryLastLine = ?
           WHERE playersArmyId = ? AND computersArmyId = ? AND isCurrentlyHappening = 1`;
 
-          db.query(updateBattleSql, [warriorId, warriorId], (err, result) => {
-            if (err) {
-              return db.rollback(() => {
-                reject(err);
-              });
-            }
-
-            const updateWarriorSql = `
-            UPDATE warriors
-            SET hasMovedThisRound = 1
-            WHERE id = ?`;
-
-            db.query(updateWarriorSql, [warriorId], (err, result) => {
+          db.query(
+            updateBattleSql,
+            [commentaryLine, playersArmyId, computersArmyId],
+            (err, result) => {
               if (err) {
                 return db.rollback(() => {
                   reject(err);
                 });
               }
 
-              const checkAllMovedSql = `
+              const updateWarriorSql = `
+              UPDATE warriors
+              SET hasMovedThisRound = 1
+              WHERE id = ?`;
+
+              db.query(updateWarriorSql, [warriorId], (err, result) => {
+                if (err) {
+                  return db.rollback(() => {
+                    reject(err);
+                  });
+                }
+
+                const checkAllMovedSql = `
               SELECT COUNT(*) AS notMovedCount
               FROM warriors
-              WHERE armyId IN (?, ?) AND hasMovedThisRound = 0`;
+              WHERE armyId IN (?, ?) AND hasMovedThisRound = 0 AND currentHealth > 0`;
 
-              db.query(
-                checkAllMovedSql,
-                [playersArmyId, computersArmyId],
-                (err, result) => {
-                  if (err) {
-                    return db.rollback(() => {
-                      reject(err);
-                    });
-                  }
+                db.query(
+                  checkAllMovedSql,
+                  [playersArmyId, computersArmyId],
+                  (err, result) => {
+                    if (err) {
+                      return db.rollback(() => {
+                        reject(err);
+                      });
+                    }
 
-                  // Check if every warrior has moved
-                  if (result[0].notMovedCount === 0) {
-                    console.log(
-                      "every warrior has moved this round, moving on to next round"
-                    );
-                    const resetWarriorsSql = `
+                    // Check if every warrior has moved
+                    if (result[0].notMovedCount === 0) {
+                      console.log(
+                        "every warrior has moved this round, moving on to next round"
+                      );
+                      const resetWarriorsSql = `
                   UPDATE warriors
                   SET hasMovedThisRound = 0
                   WHERE armyId IN (?, ?)`;
 
-                    db.query(
-                      resetWarriorsSql,
-                      [playersArmyId, computersArmyId],
-                      (err, result) => {
+                      db.query(
+                        resetWarriorsSql,
+                        [playersArmyId, computersArmyId],
+                        (err, result) => {
+                          if (err) {
+                            return db.rollback(() => {
+                              reject(err);
+                            });
+                          }
+
+                          const advanceRoundSql = `
+                    UPDATE battles
+                    SET round = round + 1
+                    WHERE playersArmyId = ? AND computersArmyId = ? AND isCurrentlyHappening = 1`;
+
+                          db.query(
+                            advanceRoundSql,
+                            [playersArmyId, computersArmyId],
+                            (err, result) => {
+                              if (err) {
+                                return db.rollback(() => {
+                                  reject(err);
+                                });
+                              }
+                              commitAndFetchBattle(
+                                playersArmyId,
+                                computersArmyId,
+                                resolve,
+                                reject
+                              );
+                            }
+                          );
+                        }
+                      );
+                    } else {
+                      db.commit((err) => {
                         if (err) {
                           return db.rollback(() => {
                             reject(err);
                           });
                         }
-
-                        const advanceRoundSql = `
-                    UPDATE battles
-                    SET round = round + 1
-                    WHERE playersArmyId = ? AND computersArmyId = ? AND isCurrentlyHappening = 1`;
-
-                        db.query(
-                          advanceRoundSql,
-                          [playersArmyId, computersArmyId],
-                          (err, result) => {
-                            if (err) {
-                              return db.rollback(() => {
-                                reject(err);
-                              });
-                            }
-                            commitAndFetchBattle(
-                              playersArmyId,
-                              computersArmyId,
-                              resolve,
-                              reject
-                            );
-                          }
+                        commitAndFetchBattle(
+                          playersArmyId,
+                          computersArmyId,
+                          resolve,
+                          reject
                         );
-                      }
-                    );
-                  } else {
-                    db.commit((err) => {
-                      if (err) {
-                        return db.rollback(() => {
-                          reject(err);
-                        });
-                      }
-                      commitAndFetchBattle(
-                        playersArmyId,
-                        computersArmyId,
-                        resolve,
-                        reject
-                      );
-                    });
+                      });
+                    }
                   }
-                }
-              );
-            });
-          });
+                );
+              });
+            }
+          );
         }
       );
     });

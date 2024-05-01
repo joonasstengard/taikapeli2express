@@ -41,7 +41,7 @@ async function warriorCastsSpellToTile(
 
     // Query to find the attacking warrior's current mana
     const queryAttackingWarrior = `
-        SELECT currentMana
+        SELECT currentMana, name
         FROM warriors
         WHERE id = ?`;
     const [attackingWarriorResult] = await db
@@ -91,10 +91,23 @@ async function warriorCastsSpellToTile(
     console.log(
       "Spell " +
         spell.name +
-        " was cast to " +
+        " was cast by warrior with id:" +
+        attackingWarriorId +
+        " to " +
         defender.name +
         " successfully, new health: " +
         newHealth
+    );
+    // return commentary line
+    return (
+      attackingWarrior.name +
+      " cast " +
+      spell.name +
+      " to " +
+      defender.name +
+      ", new health: " +
+      newHealth +
+      "."
     );
   } catch (error) {
     console.error("Error during casting spell:", error.message);

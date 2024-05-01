@@ -3,7 +3,7 @@ import advanceBattleTurn from "../lib/advanceBattleTurn";
 import fetchWarriorsFromBattleArmies from "../lib/fetchWarriorsFromBattleArmies";
 import warriorAttacksTile from "../lib/warriorAttacksTile";
 
-async function movePlayersWarriorToTile(req) {
+async function attackWithPlayersWarriorToTile(req) {
   const tileId = req.params.tileId;
   const warriorId = parseInt(req.params.warriorId);
   const playersArmyId = parseInt(req.params.playersArmyId);
@@ -18,7 +18,7 @@ async function movePlayersWarriorToTile(req) {
 
       const attackAndFetchWarriors = async () => {
         try {
-          await warriorAttacksTile(
+          const commentaryLine = await warriorAttacksTile(
             tileId,
             warriorId,
             playersArmyId,
@@ -27,7 +27,8 @@ async function movePlayersWarriorToTile(req) {
           const battleObject = await advanceBattleTurn(
             playersArmyId,
             computersArmyId,
-            warriorId
+            warriorId,
+            commentaryLine
           );
           // fetch all warriors
           const { playersWarriors, computersWarriors } =
@@ -58,4 +59,4 @@ async function movePlayersWarriorToTile(req) {
   });
 }
 
-export default movePlayersWarriorToTile;
+export default attackWithPlayersWarriorToTile;
