@@ -1,4 +1,5 @@
 import db from "../db";
+import calculateLastStandDamage from "./spellEffects/calculateLastStandDamage";
 
 async function warriorCastsSpellToTile(
   tileId: string,
@@ -68,12 +69,19 @@ async function warriorCastsSpellToTile(
     // initializing value that will be the defending warriors new health
     let newHealth;
     if (spell.baseDamageTarget > 0) {
+      // initializing damage of spell as baseDamageTarget, can be overridden by effects
+      let spellsDamage = spell.baseDamageTarget;
+      // checking for spell effects ===
+      if (spell.effect === "lastStand") {
+        // Calculate damage based on the attacking warrior's missing health
+        spellsDamage = calculateLastStandDamage(
+          attackingWarrior,
+          spell.baseDamageTarget
+        );
+      }
       // Calculate new health for the defender considering magic resistance
-      const damageReduction =
-        (defender.magicResistance / 100) * spell.baseDamageTarget;
-      const adjustedDamage = Math.round(
-        spell.baseDamageTarget - damageReduction
-      );
+      const damageReduction = (defender.magicResistance / 100) * spellsDamage;
+      const adjustedDamage = Math.round(spellsDamage - damageReduction);
       newHealth = Math.max(defender.currentHealth - adjustedDamage, 0); // Ensure health does not go below zero
     }
     if (spell.baseHealTarget > 0) {

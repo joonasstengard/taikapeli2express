@@ -1,6 +1,7 @@
 import db from "../db";
 import advanceBattleTurn from "../lib/advanceBattleTurn";
 import fetchWarriorsFromBattleArmies from "../lib/fetchWarriorsFromBattleArmies";
+import warriorWaits from "../lib/warriorWaits";
 
 // Player's warrior waits. Returns all warriors of the battle
 async function playersWarriorWaits(req) {
@@ -15,6 +16,9 @@ async function playersWarriorWaits(req) {
         reject(err);
         return;
       }
+
+      // waiting function used by everyone, restores health/stamina/mana, maybe more in the future
+      await warriorWaits(warriorId);
 
       // Fetch the warrior details from the database
       db.query(

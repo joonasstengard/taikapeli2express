@@ -1,7 +1,7 @@
 import db from "../db";
 import advanceBattleTurn from "../lib/advanceBattleTurn";
 import computerWarriorMovePosition from "../lib/computersActionsInBattle/computerWarriorMovePosition";
-import computerWarriorWait from "../lib/computersActionsInBattle/computerWarriorWait";
+import warriorWaits from "../lib/warriorWaits";
 import fetchWarriorsFromBattleArmies from "../lib/fetchWarriorsFromBattleArmies";
 import getSpellsThatComputerWarriorCanCast from "../lib/computersActionsInBattle/getSpellsThatComputerWarriorCanCast";
 import getEnemyWarriorsInRange from "../lib/getEnemyWarriorsInRange";
@@ -75,7 +75,7 @@ async function computersWarriorsTurn(req) {
               }
             }
 
-            if (successfulSpell && validTargetWarriorsForSpell) {
+            if (successfulSpell && validTargetWarriorsForSpell.length > 0) {
               // valid spell + valid targets exist, casting a spell
               // selecting random target for spell from available targets
               let spellTargetWarrior =
@@ -129,8 +129,7 @@ async function computersWarriorsTurn(req) {
             }
           }
         } else {
-          // wip: its an empty function xd but it works for waiting, but maybe add something there that happens while waiting
-          await computerWarriorWait(warriors, warriorWhoseTurnItIsToMove.id);
+          await warriorWaits(warriorWhoseTurnItIsToMove.id);
           commentaryLine = warriorWhoseTurnItIsToMove.name + " waited.";
         }
 
